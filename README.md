@@ -1,8 +1,8 @@
-Loco.Firmware by Carl Winkler
+Loco.Firmware
 =============
 
 Fez Panda II Source Code -- Locomotion Detection System
-
+by Carl Winkler
 
 This source code is compiled used .Net Micro Framework 4.3.
 The firmware provided is intended to work with a Fez Panda II microcontroller in conjuction with other
