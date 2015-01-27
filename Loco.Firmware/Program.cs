@@ -12,6 +12,7 @@ namespace Loco.Firmware
         private const int BufferLimit = 20; // The number of messages to store in the buffer before printing and emptying. This will occur at a rate of 5 messages per tick.
         private static readonly Enclosure[] Enclosures = new Enclosure[5];
         private static readonly ArrayList Buffer = new ArrayList();
+        private static Timer MessageTimer { get; set; }
 
         public static void Main()
         {
@@ -20,24 +21,22 @@ namespace Loco.Firmware
                 Enclosures[enclosure] = new Enclosure(enclosure, GetEnclosurePins(enclosure));
             }
             Debug.Print("Starting application...\n");
-            ReadEnclosures();
+            MessageTimer = new Timer(ReadEnclosures, null, SampleFrequency, Timeout.Infinite);
         }
 
         /// <summary>
-        /// This method will constantly while the microcontroller is on.
+        /// 
+        /// This method will run every 500 milliseconds (SampleFrequency).
         /// Software on the receiving computer will decide what to record
         /// </summary>
-        public static void ReadEnclosures()
+        public static void ReadEnclosures(object state)
         {
-            while (true)
+            foreach (var enclosure in Enclosures)
             {
-                foreach (var enclosure in Enclosures)
-                {
-                    Buffer.Add("Enclosure0" + enclosure.Id + ": " + enclosure.PrintLocation());
-                    if (Buffer.Count == BufferLimit) RecycleBuffer();
-                }
-                Thread.Sleep(SampleFrequency);
+                Buffer.Add("Enclosure0" + enclosure.Id + " " + enclosure.PrintLocation());
+                if (Buffer.Count == BufferLimit) RecycleBuffer();
             }
+            MessageTimer.Change(SampleFrequency, Timeout.Infinite);
         }
 
         /// <summary>
@@ -72,7 +71,7 @@ namespace Loco.Firmware
                         FEZ_Pin.Digital.An4,
                         FEZ_Pin.Digital.An5,
                         FEZ_Pin.Digital.Di51,
-                        FEZ_Pin.Digital.Di52,
+                        FEZ_Pin.Digital.Di52
                     };
                 case 2:
                     return new[]
@@ -84,7 +83,7 @@ namespace Loco.Firmware
                         FEZ_Pin.Digital.Di24,
                         FEZ_Pin.Digital.Di25,
                         FEZ_Pin.Digital.Di26,
-                        FEZ_Pin.Digital.Di27,
+                        FEZ_Pin.Digital.Di27
                     };
                 case 3:
                     return new[]
@@ -96,7 +95,7 @@ namespace Loco.Firmware
                         FEZ_Pin.Digital.Di32,
                         FEZ_Pin.Digital.Di33,
                         FEZ_Pin.Digital.Di34,
-                        FEZ_Pin.Digital.Di35,
+                        FEZ_Pin.Digital.Di35
                     };
                 case 4:
                     return new[]
@@ -108,7 +107,7 @@ namespace Loco.Firmware
                         FEZ_Pin.Digital.Di40,
                         FEZ_Pin.Digital.Di41,
                         FEZ_Pin.Digital.Di42,
-                        FEZ_Pin.Digital.Di43,
+                        FEZ_Pin.Digital.Di43
                     };
                 case 5:
                     return new[]
